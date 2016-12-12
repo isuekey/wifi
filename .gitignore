@@ -1,0 +1,7 @@
+node_modules/
+client/bower_components/*
+.idea
+dump.rdb
+*.iml
+npm-debug.log
+nohup.out

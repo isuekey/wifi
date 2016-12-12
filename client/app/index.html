@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en" ng-app="wifi">
+<!--<![endif]-->
+
+<head>
+<title>wifi</title>
+<!-- Meta -->
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="" />
+<meta name="author" content="" />
+<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+<!-- build:css styles/vendor.css -->
+<!-- bower:css -->
+<!-- endbower -->
+<!-- endbuild -->
+<!-- build:css styles/mainmin.css -->
+<!-- endbuild -->
+<!-- Global CSS -->
+<!-- Plugins CSS -->
+<link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" />
+
+
+<!-- Theme CSS -->
+<link id="custom-style" rel="stylesheet" type="text/css" href="/assets/css/custom.css" />
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+<script src="/widgets/html5shiv/dist/html5shiv.min.js"></script>
+<script src="/widgets/respond/dest/respond.min.js"></script>
+<![endif]-->
+</head>
+<body ng-style="bgStyle">
+    <!-- Add your site or application content here -->
+    <div class="wrapper">
+        <div ui-view='header'></div>
+        <div ui-view='content'></div>
+        <div ui-view='footer'></div>
+    </div>
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+    <!-- build:js scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../bower_components/angular-resource/angular-resource.js"></script>
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/lodash/lodash.js"></script>
+    <script src="../bower_components/moment/moment.js"></script>
+    <script src="../bower_components/fabric.js/dist/fabric.min.js"></script>
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="../bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:js scripts/scripts.js -->
+    <script type="text/javascript" src="/scripts/app.js"></script>
+    <script type="text/javascript" src="/scripts/controllers.js"></script>
+    <script type="text/javascript" src="/scripts/services.js"></script>
+	<script type="text/javascript" src="/scripts/directive.js" ></script>
+	<script type="text/javascript" src="/scripts/filter.js"></script>
+    
+
+    <!-- endbuild -->
+
+    <script type="text/javascript">
+    </script>
+</body>
+
+</html>
