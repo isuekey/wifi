@@ -10,6 +10,7 @@ var config = require('./config');
 var cors = require('cors');
 
 var routes = require('./routes/index');
+var gameRoute = require('./routes/gameRoute');
 
 var app = express();
 
@@ -63,6 +64,7 @@ app.use(express.static(appPath));
 app.use( "/bower_components" , express.static( path.join( __dirname , "../client/bower_components" ) ) );
 
 app.use('/', routes);
+app.use('/games', gameRoute);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

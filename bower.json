@@ -1,31 +1,32 @@
 {
-  "ignore": [
-    "**/.*",
+  "ignore" : [
+    "**\/.*",
     "node_modules",
     "bower_components",
     "test",
     "tests"
   ],
-  "name": "wifi",
-  "authors": [
+  "description" : "",
+  "authors" : [
     "starcwl <starcwl@gmail.com>"
   ],
-  "homepage": "https://github.com/Changdao/ngedu",
-  "main": "",
-  "license": "MIT",
-  "dependencies": {
-    "angular-resource": "^1.5.5",
-    "jquery": "^2.2.3",
-    "lodash": "^4.13.1",
-    "moment": "^2.13.0",
-    "fabric.js": "fabric#^1.7.1",
-    "angular": "^1.6.0",
-    "bootstrap": "^3.3.7",
-    "angular-ui-router": "ui-router#^0.3.2"
+  "resolutions" : {
+    "angular" : "1.6.0",
+    "jquery" : ">=1.7.1"
   },
-  "description": "",
-  "resolutions": {
-    "angular": "1.6.0",
-    "jquery": ">=1.7.1"
+  "main" : "",
+  "license" : "MIT",
+  "homepage" : "https:\/\/github.com\/Changdao\/ngedu",
+  "name" : "wifi",
+  "dependencies" : {
+    "angular-resource" : "^1.5.5",
+    "jquery" : "^2.2.3",
+    "lodash" : "^4.13.1",
+    "moment" : "^2.13.0",
+    "fabric.js" : "fabric#^1.7.1",
+    "angular-ui-router" : "ui-router#^0.3.2",
+    "async" : "^2.1.4",
+    "angular" : "^1.6.0",
+    "bootstrap" : "^3.3.7"
   }
 }
