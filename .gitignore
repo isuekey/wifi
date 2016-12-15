@@ -5,3 +5,4 @@ dump.rdb
 *.iml
 npm-debug.log
 nohup.out
+/client/app/assets/qrcode

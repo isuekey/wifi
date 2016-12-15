@@ -4,6 +4,29 @@ angular.module("wifi")
   .controller('ContentController', ['$rootScope', function($rootScope) {
     $rootScope.bgStyle = {};
   }])
+  .controller('RedeemController', ['$rootScope', '$scope', 'box9GameServices', '$stateParams', function($rootScope, $scope, box9GameServices, $stateParams) {
+
+    $scope.store = {
+      name:'test',
+      storeName:'xx餐厅',
+    };
+
+    $scope.password = '';
+
+    $scope.redeem = function(){
+      box9GameServices.redeemAward({id:$stateParams.id, password:$scope.password})
+        .$promise
+        .then(function(res){
+          if(res.success)
+          {
+            bootbox.alert('客户兑换'+res.data.title+res.data.desc+res.data.price+'成功');
+          }
+        });
+    };
+
+    $scope.redeem();
+
+  }])
   .controller('Game9BoxController', ['$rootScope', '$scope', '$window', 'box9GameServices', '$timeout', '$interval', function($rootScope, $scope, $window, box9GameServices, $timeout, $interval) {
     (function init() {
       $scope.bkpStyle = $rootScope.bgStyle;
@@ -16,6 +39,15 @@ angular.module("wifi")
       });
     }());
 
+
+    var realTimeAwardStatusCheck;
+
+    $scope.$on('$destroy', function(){
+      if(realTimeAwardStatusCheck)
+      {
+        $interval.cancel(realTimeAwardStatusCheck);
+      }
+    });
 
     var bounceWav = new Audio('/assets/wav/bounce.wav');
 
@@ -128,6 +160,8 @@ angular.module("wifi")
           // 选中mask的动画duration为 500 * 8， 其余为 500 * random(1,7);
           mask.on('selected', function(e) {
             var that = this;
+            // this.selectable = false;
+            this.off('selected');
             this.rect.opacity = 1;
             removeAllStarMasks(_.without(starMasks, this));
             this.animate('opacity', 0, {
@@ -139,15 +173,15 @@ angular.module("wifi")
                   .$promise
                   .then(function(res) {
                     // alert('恭喜获得' + that.award.title + that.award.desc + that.award.price);
-                    showQrCode('assets/qrcode/test.png');
-                    realTimeAward =  $interval(function(){
+                    showQrCode(res.path);
+                    realTimeAwardStatusCheck = $interval(function() {
                       box9GameServices.getAwardStatus(that.award.awardId)
                         .$promise
                         .then(function(res) {
                           console.log(res);
-                          if(res.isAwarded)
-                          {
-                            $interval.cancel(realTimeAward);
+                          if (res.isAwarded) {
+                            $interval.cancel(realTimeAwardStatusCheck);
+                            bootbox.alert('兑换'+that.award.title+that.award.desc+that.award.price+'成功');
                           }
                         });
                     }, 1000);
@@ -305,7 +339,7 @@ angular.module("wifi")
 
     var removeAllStarMasks = function(starMasks) {
       starMasks.forEach(function(e) {
-        e.selectable = false;
+        e.off('selected');
         duration = 500 * fabric.util.getRandomInt(1, 7);
         e.animate('opacity', 0, {
           onChange: canvas.renderAll.bind(canvas),

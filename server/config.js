@@ -7,7 +7,10 @@ module.exports = {
     "tablePrefix": "t_",
     "serverURL": "http://hackhome.local:5757",
     "path": {
-      "root": path.join(__dirname, '../'),
-      "qrcode": path.join(rootPath, '/client/app/assets/arcode/'),
+      "root": rootPath,
+      "qrcode": path.join(rootPath, '/client/app/assets/qrcode/'),
+      "upload": {
+        "logo": path.join(rootPath, '/client/app/upload/logo'),
+      }
     },
 }

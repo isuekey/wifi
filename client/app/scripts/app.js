@@ -39,6 +39,15 @@ var app = angular.module('wifi', [
                 },
 
             })
+            .state('app.redeem',{
+                url:'^/qrcode-redeem/:id',
+                views:{
+                    'content@':{
+                        templateUrl: 'views/redeem.html',
+                        controller: 'RedeemController'
+                    }
+                }
+            })
           ;
         $urlRouterProvider.otherwise('/index');
     })

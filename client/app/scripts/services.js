@@ -15,5 +15,13 @@ app.service("box9GameServices", ['$resource', 'baseURL', function($resource, bas
 
   this.getAwardStatus = function(awardId){
     return $resource(baseURL + '/games/box9/award-id/:id', {id:awardId}).get();
-  }
+  };
+
+  // {id:'', password:''}
+  this.redeemAward = function(obj){
+    return $resource(baseURL + '/games/box9/redeem/:id', {id:'@id'}).save(obj);
+  };
+
+
 }]);
+

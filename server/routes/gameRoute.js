@@ -12,4 +12,6 @@ router.post('/box9/qrcode', gameBusiness.getQRCode);
 
 router.get('/box9/award-id/:id', gameBusiness.checkAwardStatus);
 
+router.post('/box9/redeem/:id', gameBusiness.redeemById);
+
 module.exports = router;
