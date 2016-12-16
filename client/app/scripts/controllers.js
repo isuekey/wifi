@@ -110,7 +110,7 @@ angular.module("wifi")
             top: top,
             rx: 10,
             ry: 10,
-            opacity: 0.5,
+            opacity: 0.2,
             width: gW,
             height: gH,
             fill: colorArray.pop(),
