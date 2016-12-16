@@ -265,12 +265,22 @@ angular.module("wifi")
         })
 
         var subtitle = new fabric.Text('二维码是您唯一的消费凭证', {
-          top: gH - 120,
+          top: gH - 130,
           left: gW / 2,
           originY: 'center',
           originX: 'center',
           fill: '#cf9c73',
-          fontSize: 18,
+          fontSize: 14,
+          selectable: false,
+        })
+
+        var subtitle2 = new fabric.Text('请截屏保存，消费时请商家扫描确认。', {
+          top: gH - 110,
+          left: gW / 2,
+          originY: 'center',
+          originX: 'center',
+          fill: '#cf9c73',
+          fontSize: 14,
           selectable: false,
         })
 
@@ -281,7 +291,7 @@ angular.module("wifi")
         results.successBtn.left = gW / 2;
         results.successBtn.top = gH - 70;
 
-        var winMsgGroup = new fabric.Group([results.successBg, results.successBtn, results.qrCode, title, subtitle], {
+        var winMsgGroup = new fabric.Group([results.successBg, results.successBtn, results.qrCode, title, subtitle, subtitle2], {
           top: 60,
           height: 425,
           left: $window.innerWidth / 2,
@@ -299,6 +309,7 @@ angular.module("wifi")
           results.qrCode.remove();
           title.remove();
           subtitle.remove();
+          subtitle2.remove();
         });
 
         canvas.add(grayBg);
