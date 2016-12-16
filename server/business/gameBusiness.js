@@ -72,6 +72,11 @@ exports.redeemById = function(req, res, next) {
     });
   }
   else{
-    res.send({success:false});
+    if(req.body.password.length>0)
+    {
+      res.status(401).send({success:false});
+    }
+    else{
+      res.send({success:false}); }
   }
 };

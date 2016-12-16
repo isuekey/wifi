@@ -7,20 +7,21 @@ angular.module("wifi")
   .controller('RedeemController', ['$rootScope', '$scope', 'box9GameServices', '$stateParams', function($rootScope, $scope, box9GameServices, $stateParams) {
 
     $scope.store = {
-      name:'test',
-      storeName:'xx餐厅',
+      name: 'test',
+      storeName: 'xx餐厅',
     };
 
     $scope.password = '';
 
-    $scope.redeem = function(){
-      box9GameServices.redeemAward({id:$stateParams.id, password:$scope.password})
+    $scope.redeem = function() {
+      box9GameServices.redeemAward({ id: $stateParams.id, password: $scope.password })
         .$promise
-        .then(function(res){
-          if(res.success)
-          {
-            bootbox.alert('客户兑换'+res.data.title+res.data.desc+res.data.price+'成功');
+        .then(function(res) {
+          if (res.success) {
+            bootbox.alert('客户兑换' + res.data.title + res.data.desc + res.data.price + '成功');
           }
+        }, function(res) {
+          bootbox.alert('商户账户/密码有误，请确认后重新输入。')
         });
     };
 
@@ -42,9 +43,8 @@ angular.module("wifi")
 
     var realTimeAwardStatusCheck;
 
-    $scope.$on('$destroy', function(){
-      if(realTimeAwardStatusCheck)
-      {
+    $scope.$on('$destroy', function() {
+      if (realTimeAwardStatusCheck) {
         $interval.cancel(realTimeAwardStatusCheck);
       }
     });
@@ -181,7 +181,7 @@ angular.module("wifi")
                           console.log(res);
                           if (res.isAwarded) {
                             $interval.cancel(realTimeAwardStatusCheck);
-                            bootbox.alert('兑换'+that.award.title+that.award.desc+that.award.price+'成功');
+                            bootbox.alert('兑换' + that.award.title + that.award.desc + that.award.price + '成功');
                           }
                         });
                     }, 1000);
