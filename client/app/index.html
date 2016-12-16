@@ -43,6 +43,18 @@
         <div ui-view='footer'></div>
     </div>
 
+    <script>
+        window.onload = showViewport;
+        window.onresize = showViewport;
+        var browserWidth,
+             browseHeight;
+        function showViewport() {
+          var output=document.getElementById("output");
+           browserWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+           browseHeight= Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+        } 
+    </script>
+
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->

@@ -40,6 +40,9 @@ angular.module("wifi")
       });
     }());
 
+    var bW = $window.innerWidth;
+    var bH = browseHeight;
+
 
     var realTimeAwardStatusCheck;
     $scope.$on('$destroy', function() {
@@ -58,7 +61,7 @@ angular.module("wifi")
     // for canvas
     var canvas = new fabric.Canvas('box9canvas', {
       width: $window.innerWidth,
-      height: $window.innerHeight,
+      height: bH,
       selection: false
     });
 
@@ -100,7 +103,7 @@ angular.module("wifi")
       ticketsFly: function(cb) {
         fabric.Sprite.fromURL('assets/images/9gimages/tickets_fly.png', function(sprite) {
           cb(null, sprite);
-        },{originX:'center', originY:'bottom', left:$window.innerWidth/2, top:$window.innerHeight - 10});
+        },{originX:'center', originY:'bottom', left:$window.innerWidth/2, top:bH - 10});
       }
     }, function(err, results) {
       var rects = [],
@@ -248,7 +251,7 @@ angular.module("wifi")
           results.ticketsFly.remove();
         });
       }, 400)
-      boxGroup.animate('top', $window.innerHeight - 10, {
+      boxGroup.animate('top', bH - 10, {
         duration: 1000,
         onChange: canvas.renderAll.bind(canvas),
         easing: fabric.util.ease['easeOutBounce'],
@@ -287,7 +290,7 @@ angular.module("wifi")
         var grayBg = new fabric.Rect({
           left: 0,
           top: 0,
-          height: $window.innerHeight,
+          height: bH,
           width: $window.innerWidth,
           fill: 'black',
           opacity: 0,
