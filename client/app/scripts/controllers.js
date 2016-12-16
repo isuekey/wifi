@@ -42,12 +42,15 @@ angular.module("wifi")
 
 
     var realTimeAwardStatusCheck;
-
     $scope.$on('$destroy', function() {
+      disableChecker();
+    });
+    var disableChecker = function() {
       if (realTimeAwardStatusCheck) {
         $interval.cancel(realTimeAwardStatusCheck);
       }
-    });
+    };
+
 
     var bounceWav = new Audio('/assets/wav/bounce.wav');
 
@@ -92,6 +95,11 @@ angular.module("wifi")
         }, function(err, results) {
           cb(err, results);
         })
+      },
+      ticketsFly: function(cb) {
+        fabric.Sprite.fromURL('assets/images/9gimages/tickets_fly.png', function(sprite) {
+          cb(null, sprite);
+        },{originX:'center', originY:'bottom', left:$window.innerWidth/2, top:$window.innerHeight - 10});
       }
     }, function(err, results) {
       var rects = [],
@@ -117,6 +125,22 @@ angular.module("wifi")
             cornerStyle: 'circle'
           });
           rects.push(rect);
+
+          var rectBorder = new fabric.Rect({
+            left: left,
+            top: top,
+            rx: 10,
+            ry: 10,
+            width: gW - 5,
+            height: gH - 5,
+            stroke: 'red',
+            strokeWidth: 6,
+            fill: undefined,
+            cornerStyle: 'circle',
+            opacity: 0,
+          })
+          rects.push(rectBorder);
+
 
           // text group
           var award = awards.pop();
@@ -155,12 +179,13 @@ angular.module("wifi")
           mask.lockMovementY = true;
           mask.hasBorders = mask.hasControls = false;
           mask.rect = rect;
+          mask.rectBorder = rectBorder;
           mask.award = award;
+
 
           // 选中mask的动画duration为 500 * 8， 其余为 500 * random(1,7);
           mask.on('selected', function(e) {
             var that = this;
-            // this.selectable = false;
             this.off('selected');
             this.rect.opacity = 1;
             removeAllStarMasks(_.without(starMasks, this));
@@ -168,11 +193,20 @@ angular.module("wifi")
               onChange: canvas.renderAll.bind(canvas),
               duration: 500 * 8,
               onComplete: function() {
+
+                function loop() {
+                  that.rectBorder.animate('opacity', that.rectBorder.getOpacity() < 0.5 ? 1 : 0, {
+                    duration: 500,
+                    onChange: canvas.renderAll.bind(canvas),
+                    onComplete: loop
+                  });
+                }
+                loop();
+
                 that.award.awardId = fabric.util.getRandomInt(10000, 99999);
                 box9GameServices.getQrCodeWithAward(that.award)
                   .$promise
                   .then(function(res) {
-                    // alert('恭喜获得' + that.award.title + that.award.desc + that.award.price);
                     showQrCode(res.path);
                     realTimeAwardStatusCheck = $interval(function() {
                       box9GameServices.getAwardStatus(that.award.awardId)
@@ -207,6 +241,11 @@ angular.module("wifi")
 
       $timeout(function() {
         bounceWav.play();
+        canvas.add(results.ticketsFly);
+        results.ticketsFly.play(function() {
+          results.ticketsFly.stop();
+          results.ticketsFly.remove();
+        });
       }, 400)
       boxGroup.animate('top', $window.innerHeight - 10, {
         duration: 1000,
@@ -310,6 +349,7 @@ angular.module("wifi")
           title.remove();
           subtitle.remove();
           subtitle2.remove();
+          disableChecker();
         });
 
         canvas.add(grayBg);
@@ -358,5 +398,13 @@ angular.module("wifi")
         });
       });
     };
+
+
+
+
+    (function render() {
+      canvas.renderAll();
+      fabric.util.requestAnimFrame(render);
+    })();
 
   }]);

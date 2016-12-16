@@ -2,8 +2,8 @@ fabric.Sprite = fabric.util.createClass(fabric.Image, {
 
   type: 'sprite',
 
-  spriteWidth: 50,
-  spriteHeight: 72,
+  spriteWidth: 360,
+  spriteHeight: 150,
   spriteIndex: 0,
 
   initialize: function(element, options) {
@@ -54,7 +54,7 @@ fabric.Sprite = fabric.util.createClass(fabric.Image, {
     );
   },
 
-  play: function() {
+  play: function(cb) {
     var _this = this;
     this.animInterval = setInterval(function() {
 
@@ -62,6 +62,7 @@ fabric.Sprite = fabric.util.createClass(fabric.Image, {
 
       _this.spriteIndex++;
       if (_this.spriteIndex === _this.spriteImages.length) {
+        cb();
         _this.spriteIndex = 0;
       }
     }, 100);
