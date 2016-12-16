@@ -54,6 +54,7 @@ angular.module("wifi")
 
     var bounceWav = new Audio('/assets/wav/bounce.wav');
 
+
     // for canvas
     var canvas = new fabric.Canvas('box9canvas', {
       width: $window.innerWidth,
@@ -131,10 +132,10 @@ angular.module("wifi")
             top: top,
             rx: 10,
             ry: 10,
-            width: gW - 5,
-            height: gH - 5,
+            width: gW - 4,
+            height: gH - 4,
             stroke: 'red',
-            strokeWidth: 6,
+            strokeWidth: 5,
             fill: undefined,
             cornerStyle: 'circle',
             opacity: 0,

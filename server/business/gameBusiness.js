@@ -60,7 +60,7 @@ exports.checkAwardStatus = function(req, res, next) {
 
 
 exports.redeemById = function(req, res, next) {
-  if (req.params.id && (req.session.name || req.body.password === '123456') ) {
+  if (req.params.id && (req.session.name && !req.body.password || req.body.password === '123456') ) {
     req.session.name = 'test';
 
     client.get(req.params.id, function(err, reply) {
@@ -74,6 +74,7 @@ exports.redeemById = function(req, res, next) {
   else{
     if(req.body.password.length>0)
     {
+      req.session.name = '';
       res.status(401).send({success:false});
     }
     else{
