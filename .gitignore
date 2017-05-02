@@ -6,3 +6,4 @@ dump.rdb
 npm-debug.log
 nohup.out
 /client/app/assets/qrcode
+.DS_Store

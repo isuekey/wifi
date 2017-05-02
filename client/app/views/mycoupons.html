@@ -1,0 +1,15 @@
+<div class="container">
+    <table style="width: 100%">
+        <tr ng-repeat="couponItem in couponListModel.data.projectList">
+            <td>
+                {{couponItem.title}}
+            </td>
+            <td>
+                {{couponItem.desc}}
+            </td>
+            <td>
+                <span ng-click="showQrCode(couponItem)">展示</span>
+            </td>
+        </tr>
+    </table>
+</div>

@@ -3,54 +3,77 @@ var app = angular.module('wifi', [
     // 'angularUtils.directives.dirPagination',
     'ngResource',
     'ui.router',
+    'LocalStorageModule',
+    'ui.bootstrap',
+    'monospaced.qrcode'
     // 'ae-datetimepicker'
-  ])
-  .config(function($stateProvider, $urlRouterProvider) {
+    ])
+.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
-      .state('app', {
+    .state('app', {
         url: '/',
         views: {
-          'header': {
-            templateUrl: 'views/header.html',
-            // controller: 'HeaderController'
-          },
-          'content': {
-            templateUrl: 'views/content.html',
-            controller: 'ContentController'
-          },
-          'footer': {
-            templateUrl: 'views/footer.html'
-          }
+            'header': {
+                templateUrl: 'views/header.html'
+            },
+            'content': {
+                templateUrl: 'views/content.html',
+                controller: 'ContentController'
+            },
+            'footer': {
+                templateUrl: 'views/footer.html'
+            }
         }
-      })
-      .state('app.index', {
+    })
+    .state('app.index', {
         url: '^/index',
-        onEnter: function($state, $window, $timeout) {
-          $state.go('app.game9box');
+        views:{
+            'content@': {
+                templateUrl: 'views/game-9box.html',
+                controller: 'IndexController'
+            }
         }
-      })
-      .state('app.game9box', {
+    })
+    .state('app.game9box', {
         url: '^/game-9box',
         views: {
-          'content@': {
-            templateUrl: 'views/game-9box.html',
-            controller: 'Game9BoxController'
-          }
-        },
-
-      })
-      .state('app.redeem', {
+            'content@': {
+                templateUrl: 'views/game-9box.html',
+                controller: 'Game9BoxController'
+            }
+        }
+    })
+    .state('app.redeem', {
         url: '^/qrcode-redeem/:id',
         views: {
-          'content@': {
-            templateUrl: 'views/redeem.html',
-            controller: 'RedeemController'
-          }
+            'content@': {
+                templateUrl: 'views/redeem.html',
+                controller: 'RedeemController'
+            }
         }
-      });
+    })
+    .state('app.login',{
+        url:'^/login',
+        views:{
+            'content@':{
+                templateUrl:'views/login.html',
+                controller:'LoginController'
+            }
+        }
+    })
+    .state('app.coupons',{
+        url:'^/coupons',
+        views:{
+            'content@':{
+                templateUrl:'views/mycoupons.html',
+                controller:'MyCouponController'
+            }
+        }
+    })
+    ;
     $urlRouterProvider.otherwise('/index');
-  });
-
-// app.run(['', function(){
-
-// }]);
+})
+.run(function($rootScope,localStorageService){
+    $rootScope.account = localStorageService.get('account');
+    $rootScope.nineCopons = [];
+});
