@@ -1,0 +1,25 @@
+
+.ninecoupon-qrcode {
+    background-color: #fff1c7;
+}
+
+
+.ninecoupon-qrcode-background > div{
+    margin-top: 50px;
+    margin-left: 24px;
+    margin-right: 24px;
+}
+
+
+.ninecoupon-qrcode > img{ 
+    width: calc(100% + 40px);
+    position: relative;
+    top: -20px;
+    left: -20px;
+}
+
+.ninecoupon-qrcode .qrcode-label {
+    margin-left: 16px;
+    margin-right: 16px;
+    text-align: center;
+}

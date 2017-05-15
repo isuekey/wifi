@@ -8,7 +8,8 @@ var app = angular.module('wifi', [
     'monospaced.qrcode'
     // 'ae-datetimepicker'
     ])
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+    $httpProvider.interceptors.push('wifiHttpInterceptor');
     $stateProvider
     .state('app', {
         url: '/',
@@ -26,7 +27,7 @@ var app = angular.module('wifi', [
         }
     })
     .state('app.index', {
-        url: '^/index',
+        url: '^/index/:areaId',
         views:{
             'content@': {
                 templateUrl: 'views/game-9box.html',
@@ -73,7 +74,19 @@ var app = angular.module('wifi', [
     ;
     $urlRouterProvider.otherwise('/index');
 })
-.run(function($rootScope,localStorageService){
-    $rootScope.account = localStorageService.get('account');
+.run(function($rootScope,localStorageService, EnnUtilities, box9GameServices, $state){
+    $rootScope.$on("event:auth-refreshToken", function(){
+        box9GameServices.refreshToken();
+    });
+    $rootScope.$on('event:auth-goto-login', function(){
+        $state.go("app.login");
+    });
+    $rootScope.account = EnnUtilities.getLocalData('account', true);
     $rootScope.nineCopons = [];
+    $rootScope.areaId = '';
+    $rootScope.UUID = localStorageService.get('deviceId');
+    if(!$rootScope.UUID){
+        $rootScope.UUID = EnnUtilities.guid();
+        localStorageService.set('deviceId', $rootScope.UUID);
+    };
 });
