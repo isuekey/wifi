@@ -7,7 +7,7 @@
         <ul class="dropdown-menu">
             <li ng-if="!account"><a ui-sref="app.login">登录</a></li>
             <li><a ui-sref="app.coupons">我的优惠券</a></li>
-            <li><a href="#">抽奖</a></li>
+            <li><a ui-sref="app.index({areaId:areaId})" >抽奖</a></li>
         </ul>
     </div>
 </div>    

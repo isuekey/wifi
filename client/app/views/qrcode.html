@@ -1,4 +1,6 @@
-<div class="container">
-    <qrcode data="{{qrcodeModel.data}}" version="12" error-correction-level="Q" size="200" ></qrcode>
+<div class="container-fluid" style="min-height: 60vh; margin: 16px;" >
+    <label>{{ qrcodeModel.title }}</label>
+    <qrcode data="{{qrcodeModel.data}}" version="12" error-correction-level="Q" size="200" class="center-block" style="position: relative; top: calc(50% - 100px); width: 200px;"></qrcode>
+    <label>建议截屏保存，或者收藏网页</label>
 </div>
 
