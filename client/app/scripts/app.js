@@ -62,6 +62,15 @@ var app = angular.module('wifi', [
             }
         }
     })
+    .state('app.signup',{
+        url:'^/signup',
+        views:{
+            'content@':{
+                templateUrl:'views/signup.html',
+                controller:'SignUpController'
+            }
+        }
+    })
     .state('app.coupons',{
         url:'^/coupons',
         views:{
@@ -74,19 +83,30 @@ var app = angular.module('wifi', [
     ;
     $urlRouterProvider.otherwise('/index');
 })
-.run(function($rootScope,localStorageService, EnnUtilities, box9GameServices, $state){
+.value("NineCouponValues",{
+    retryTimes:{
+        wifi:0
+    }
+})
+.run(function($rootScope, NineCouponUtilities, box9GameServices, $state){
     $rootScope.$on("event:auth-refreshToken", function(){
         box9GameServices.refreshToken();
     });
     $rootScope.$on('event:auth-goto-login', function(){
         $state.go("app.login");
     });
-    $rootScope.account = EnnUtilities.getLocalData('account', true);
+    $rootScope.account = NineCouponUtilities.getLocalData('account', true);
     $rootScope.nineCopons = [];
     $rootScope.areaId = '';
-    $rootScope.UUID = localStorageService.get('deviceId');
+    $rootScope.UUID = NineCouponUtilities.getLocalData('deviceId');
     if(!$rootScope.UUID){
-        $rootScope.UUID = EnnUtilities.guid();
-        localStorageService.set('deviceId', $rootScope.UUID);
+        $rootScope.UUID = NineCouponUtilities.guid();
+        NineCouponUtilities.saveLocalData('deviceId', $rootScope.UUID);
+    };
+    $rootScope.logoutAccount = function logoutAccount(){
+        box9GameServices.logoutAccount()
+        .then((success)=>{
+            $state.go("app.login");
+        });
     };
 });

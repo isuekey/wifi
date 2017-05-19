@@ -1,4 +1,4 @@
-<div>
+<div style="padding-left: 16px; padding-top:8px; padding-bottom: 8px;">
     <!-- Single button -->
     <div class="btn-group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -8,6 +8,7 @@
             <li ng-if="!account"><a ui-sref="app.login">登录</a></li>
             <li><a ui-sref="app.coupons">我的优惠券</a></li>
             <li><a ui-sref="app.index({areaId:areaId})" >抽奖</a></li>
+            <li ng-if="account" ng-click="logoutAccount()"><a >注销</a></li>
         </ul>
     </div>
 </div>    

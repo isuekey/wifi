@@ -1,13 +1,8 @@
 
-.ninecoupon-qrcode {
-    background-color: #fff1c7;
-}
-
-
 .ninecoupon-qrcode-background > div{
     margin-top: 50px;
-    margin-left: 24px;
-    margin-right: 24px;
+    margin-left: 16%;
+    margin-right: 16%;
 }
 
 
@@ -22,4 +17,15 @@
     margin-left: 16px;
     margin-right: 16px;
     text-align: center;
+}
+
+.ninecoupon-qrcode .qrcode-label span {
+    color: gray;
+}
+.ninecoupon-background{
+    background-color: #fff1c7;
+}
+
+.ninecoupon-radius-border{
+    border-radius: 4px;
 }

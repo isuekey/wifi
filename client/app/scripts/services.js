@@ -5,14 +5,14 @@ var app = angular.module("wifi");
 // app.constant('baseApiUrl', 'http://192.168.31.104:10010');
 // app.constant('baseApiUrl', 'http://192.168.2.104:10010');
 app.constant('baseApiUrl', '');
-// app.constant('baseApiUrl', 'http://192.168.1.102:10010');
+// app.constant('baseApiUrl', 'http://192.168.1.102:10010');\
 
 app.service("mainServices", [function() {
 
 }]);
 
-app.service("box9GameServices", ['$resource','baseApiUrl', 'EnnUtilities',"$http","$q","$uibModal","httpBuffer","$rootScope",
-    function($resource, baseApiUrl, EnnUtilities, $http, $q,$uibModal, httpBuffer, $rootScope) {
+app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities',"$http","$q","$uibModal","httpBuffer","$rootScope","NineCouponModal",
+    function($resource, baseApiUrl, NineCouponUtilities, $http, $q,$uibModal, httpBuffer, $rootScope, NineCouponModal) {
         var self = this;
         self.getQrCodeWithAward = function(award) {
             return $resource(baseApiUrl + '/games/box9/qrcode').save(award);
@@ -30,45 +30,28 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'EnnUtilities',"$http
         return $resource(`${baseApiUrl}/ninecoupon/account`).get()
         .$promise
         .then(function successFunction(success){
-            EnnUtilities.saveLocalData("account", success, true);
-            $rootScope.account = EnnUtilities.getLocalData('account', true);
-            var reward = EnnUtilities.getLocalData("reward", true);
+            NineCouponUtilities.saveLocalData("account", success, true);
+            $rootScope.account = NineCouponUtilities.getLocalData('account', true);
+            var reward = NineCouponUtilities.getLocalData("reward", true);
             if(reward){
                 self.takeOffTheNineCoupon(reward)
-                .$promise
                 .then((success)=>{
-                    reward.instanceId = success.id;
-                    reward.consumer = success.account;
-                    var theConfig = {award:reward};
-                    var theModal = $uibModal.open({
-                        animation: true,
-                        size: 'lg',
-                        templateUrl : 'views/qrcode.html',
-                        controller:"QrCodeController",
-                        resolve:{
-                            QrCodeModelConfig: function(){
-                                return theConfig;
-                            }
-                        }
-                    });
-                    theModal.result.then(function(){
-                        let couponArray = localStorageService.get('couponArray') || [];
+                    var handleModal = function(){
+                        let couponArray = NineCouponUtilities.getLocalData('couponArray'+$rootScope.account.id) || [];
                         couponArray = couponArray.filter(function(ele){
                             return !!ele;
                         });
                         couponArray.push(that.award);
-                        localStorageService.set('couponArray', couponArray);
-                    }, function(){
-                        let couponArray = localStorageService.get('couponArray') || [];
-                        couponArray = couponArray.filter(function(ele){
-                            return !!ele;
-                        });
-                        couponArray.push(that.award);
-                        localStorageService.set('couponArray', couponArray);
-                    });
+                        NineCouponUtilities.saveLocalData('couponArray'+$rootScope.account.id, couponArray);
+                    };
+                    NineCouponModal.showQrcodeModal(success, handleModal, handleModal);
                 });
-            }
-        })
+            };
+            return success;
+        });
+    };
+    self.signup = function(account){
+        return $resource(`${baseApiUrl}/ninecoupon/signup`).save({},account).$promise;
     };
 
     self.login = function(account){
@@ -86,8 +69,7 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'EnnUtilities',"$http
             var token = response.data;
             expiredAt.setSeconds(expiredAt.getSeconds() + token.expires_in);
             token.expires_at = expiredAt.getTime();
-            EnnUtilities.saveLocalData('token', token);
-            self.getAccountInfo();
+            NineCouponUtilities.saveLocalData('token', token);
             deferred.resolve(response);
             httpBuffer.retryAll();
         },function (error) {
@@ -95,21 +77,23 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'EnnUtilities',"$http
         });
         return promise;
     };
+    self.logoutAccount = function logoutAccount(){
+        NineCouponUtilities.removeLocalData("token");
+        NineCouponUtilities.removeLocalData("account");
+        $rootScope.account = undefined;
+        var defered = $q.defer();
+        defered.resolve("ok")
+        return defered.promise;
+    };
     self.getUserNineCouponsToAwards = function getUserNineCouponsToAwards(areaIndex){
-        return $resource(`${baseApiUrl}/ninecoupon/coupon/wifi/:areaIndex`, {areaIndex:areaIndex}).query();
+        return $resource(`${baseApiUrl}/ninecoupon/coupon/wifi/:areaIndex`, {areaIndex:areaIndex}).query().$promise;
     };
     self.takeOffTheNineCoupon = function takeOffTheNineCoupon(coupon){
-        var body = {
-            randomId: Math.floor(Math.random() * 100000),
-            templateId: coupon.id,
-            name: coupon.templatename,
-            data: coupon.data,
-            shopId: coupon.shopid,
-        }
-        return $resource(`${baseApiUrl}/ninecoupon/coupon`).save({}, body);
+        coupon.randomId = Math.floor(Math.random() * 100000);
+        return $resource(`${baseApiUrl}/ninecoupon/coupon`).save({}, coupon).$promise;
     };
     self.refreshToken = function refreshToken(){
-        var token = EnnUtilities.getLocalData("token");
+        var token = NineCouponUtilities.getLocalData("token");
         var deferred = $q.defer();
         var promise = deferred.promise;
         var data = "refresh_token=" +  token.refresh_token + "&grant_type=refresh_token";
@@ -124,19 +108,41 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'EnnUtilities',"$http
             var token = response.data;
             expiredAt.setSeconds(expiredAt.getSeconds() + token.expires_in);
             token.expires_at = expiredAt.getTime();
-            console.log(token);
-            EnnUtilities.saveLocalData('token', token);
-            self.getAccountInfo();
+            NineCouponUtilities.saveLocalData('token', token);
             deferred.resolve(response);
             httpBuffer.retryAll();
         }, function (error) {
             deferred.reject(error);
         });
         return promise;
+    };
+    self.queryMyCoupons = function queryMyCoupons(){
+        return $resource(`${baseApiUrl}/ninecoupon/coupon/list`).query().$promise;
     }
 }]);
+app.factory("NineCouponModal", function($uibModal){
+    return {
+        showQrcodeModal: function showQrcodeModal(couponInstance, positiveFunc, negativeFunc){
+            var theConfig = {award:couponInstance};
+            var theModal = $uibModal.open({
+                animation: true,
+                size: 'lg',
+                templateUrl : 'views/qrcode.html',
+                controller:"QrCodeController",
+                resolve:{
+                    QrCodeModelConfig: function(){
+                        return theConfig;
+                    }
+                },
+                windowClass:'ninecoupon-qrcode-background'
+            });
+            theModal.result.then(positiveFunc, negativeFunc);
+        }
 
-app.factory('EnnUtilities',function(localStorageService){
+    }
+})
+
+app.factory('NineCouponUtilities',function(localStorageService){
     return {
         guid : function guid(){
             /** it just version 4 guid **/
@@ -166,19 +172,19 @@ app.factory('EnnUtilities',function(localStorageService){
         removeLocalData:function removeLocalData(dataKey){
             localStorageService.remove(dataKey);
         },
-        base64encode(input){
+        base64encode: function base64encode(input){
             return btoa(encodeURIComponent(input).replace(/%([0-9A-F]{2})/g, function(matach,p1){
                 return String.fromCharCode(parseInt('0x'+p1, 16));
             }));            
         },
-        base64decode(input){
+        base64decode: function base64decode(input){
             return decodeURIComponent(Array.prototype.map.call(atob(input), function(c){
                 return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);
             }).join(''));
         }
     }
 });
-app.factory('wifiHttpInterceptor', function($q, EnnUtilities, httpBuffer, $rootScope) {
+app.factory('wifiHttpInterceptor', function($q, NineCouponUtilities, httpBuffer, $rootScope) {
     return {
         // optional method
         'request': function(config) {
@@ -187,7 +193,7 @@ app.factory('wifiHttpInterceptor', function($q, EnnUtilities, httpBuffer, $rootS
                 return config;
             }else if (config.url.indexOf('/ninecoupon/') > -1){
                 //使用token
-                var token = EnnUtilities.getLocalData('token');
+                var token = NineCouponUtilities.getLocalData('token');
                 if(token){
                     config.headers.Authorization =  `Bearer ${ token.access_token}`;
                 }
@@ -218,9 +224,8 @@ app.factory('wifiHttpInterceptor', function($q, EnnUtilities, httpBuffer, $rootS
         // optional method
         'responseError': function(rejection) {
             // do something on error
-            console.log(rejection);
             //401 而且不是 更新 token
-            var token = EnnUtilities.getLocalData("token");
+            var token = NineCouponUtilities.getLocalData("token");
             let retriablle = rejection.status == 401 && rejection.config.url.indexOf('/oauth/token') == -1 && token && token.refresh_token;
             if(retriablle){
                 var deferred = $q.defer();
@@ -228,26 +233,28 @@ app.factory('wifiHttpInterceptor', function($q, EnnUtilities, httpBuffer, $rootS
                 $rootScope.$broadcast('event:auth-refreshToken', rejection);
             }else{
                 httpBuffer.rejectAll();
-                EnnUtilities.removeLocalData("token")
-                EnnUtilities.removeLocalData("account");
+                NineCouponUtilities.removeLocalData("token")
+                NineCouponUtilities.removeLocalData("account");
             };
             return $q.reject(rejection);
         }
     };
 })
-.factory('httpBuffer', ["$injector", function ($injector){
+.factory('httpBuffer', ["$injector","$rootScope","baseApiUrl", function ($injector, $rootScope, baseApiUrl){
     var buffer = [];
     var $http;
-
+    var pathBeginIndex = baseApiUrl.length;
     function retryHttpRequest(config, deferred) {
         function successCallback(response) {
             deferred.resolve(response);
+            var eventsIdentifier = config.url.substring(pathBeginIndex);
+            $rootScope.$broadcast("events:"+eventsIdentifier, response);
         };
         function errorCallback(response) {
             deferred.reject(response);
         };
         $http = $http || $injector.get('$http');
-        $http(config).then(successCallback, errorCallback);
+        $http(config).then(successCallback, errorCallback).$promise;
     }
 
     return {

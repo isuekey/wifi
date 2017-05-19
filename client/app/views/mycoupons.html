@@ -1,17 +1,18 @@
 <div class="container">
-    <table style="width: 100%">
-        <tr ng-repeat="couponItem in couponListModel.data.projectList">
+    <label style="float: right;">我的优惠券</label>
+    <table style="width: 100%" class="table">
+        <tr ng-repeat="couponItem in couponListModel.data.couponList | orderBy:'created_at':true track by couponItem.id">
             <td>
-                {{couponItem.title}}
+                {{couponItem.shopName}}
             </td>
             <td>
-                {{couponItem.desc}}
+                {{couponItem.name}}
             </td>
             <td>
-                {{couponItem.instanceId}}
+                抵用{{showCouponInfo(couponItem)}}
             </td>
-            <td>
-                <span ng-click="showQrCode(couponItem)">展示</span>
+            <td style="width: 60px">
+                <span ng-click="showQrCode(couponItem)" ng-if="couponItem.status == 'enabled'">展示</span>
             </td>
         </tr>
     </table>

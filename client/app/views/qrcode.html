@@ -1,11 +1,16 @@
-<div class="container-fluid ninecoupon-qrcode" style="min-height: 60vh;padding: 0px" >
+<div class="container-fluid ninecoupon-qrcode ninecoupon-background ninecoupon-radius-border" style="min-height: 60vh;padding: 0px; padding-bottom: 16px" >
     <img src="assets/images/qrcode-background-top.png">
-    <div  class="qrcode-label">
-        <label>{{ qrcodeModel.title }}</label>
+    <div  class="qrcode-label" style="margin-bottom: 0px;">
+        <span><span style="font-size: 30px; color: #ff8e00;">{{ qrcodeModel.data.offset }}元</span></span>
     </div>
-    <qrcode data="{{qrcodeModel.data}}" version="12" error-correction-level="Q" size="200" class="center-block" style="position: relative; top: calc(50% - 100px); width: 200px;"></qrcode>
-    <div class="qrcode-label">
-        <label>建议截屏保存，或者收藏网页</label>
+    <qrcode data="{{qrcodeModel.qrcode}}" version="12" error-correction-level="Q" size="160" class="center-block" style="position: relative; top: calc(50% - 100px); width: 160px;"></qrcode>
+    <div class="qrcode-label" style="margin-top: 8px;">
+        <span>抵用{{qrcodeModel.data.offset}}元<span style="font-size: 12px">{{qrcodeModel.data.consumption ? "消费满"+qrcodeModel.data.consumption : "不设找赎"}}元</span></span>
+    </div>
+    <div class="qrcode-label" style="margin-top: 8px;">
+        <span style="font-size: 12px;">请在 <span style="font-size: 14px; color: black;">{{qrcodeModel.shopAddress || "**"}}</span> 的 <span style="font-size: 16px; color: black;">{{qrcodeModel.shopName}}</span> 使用此优惠券</span>
+    </div>
+    <div class="qrcode-label" style="margin-top: 8px;">
+        <span style="font-size: 12px;">建议截屏保存，或者收藏网页</span>
     </div>
 </div>
-

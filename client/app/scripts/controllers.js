@@ -27,40 +27,60 @@ angular.module("wifi")
 
     $scope.redeem();
 }])
-.controller('LoginController', ['$rootScope', '$scope', 'box9GameServices', 'localStorageService','$state', 
-function($rootScope, $scope, box9GameServices,localStorageService, $state){
+.controller('SignUpController', ['$rootScope', '$scope', 'box9GameServices','$state', 
+function($rootScope, $scope, box9GameServices, $state){
+    $scope.account = {};
+    $rootScope.account = undefined;
+    $scope.signup = function(){
+        box9GameServices.signup($scope.account).then((createdAccount)=>{
+            console.log(createdAccount);
+            return box9GameServices.login({
+                name: $scope.account.account,
+                password: $scope.account.password
+            });
+        }).then((successToken)=>{
+            console.log(successToken);
+            return box9GameServices.getAccountInfo();
+        }).then((accountInfo)=>{
+            console.log(accountInfo);
+            $state.go("app.coupons");
+        }).catch((error)=>{
+            console.log(error)
+        })
+    };
+}])
+.controller('LoginController', ['$rootScope', '$scope', 'box9GameServices','$state', 
+function($rootScope, $scope, box9GameServices, $state){
     $scope.account = {};
     $rootScope.account = undefined;
     $scope.login = function(){
         box9GameServices.login($scope.account)
         .then((success)=>{
-            console.log(success);
-            $state.go("app.coupons");
+            box9GameServices.getAccountInfo().then((res)=>{
+                console.log(res);
+                $state.go("app.coupons");
+            });
         }, (error)=>{
             console.log(error);
         });
     };
 }])
-.controller('IndexController',['$rootScope', '$scope', 'box9GameServices', '$state', '$stateParams', 'localStorageService',
-function($rootScope, $scope, box9GameServices, $state, $stateParams, localStorageService){
+.controller('IndexController',['$rootScope', '$scope', 'box9GameServices', '$state', '$stateParams', 'NineCouponUtilities',"NineCouponValues",
+function($rootScope, $scope, box9GameServices, $state, $stateParams, NineCouponUtilities,NineCouponValues){
     $scope.getUserNineCouponsForAwards = function getUserNineCouponsForAwards(areaId){
+        NineCouponValues.retryTimes.wifi++;
         box9GameServices.getUserNineCouponsToAwards(areaId)
-        .$promise
         .then(function successFunction(success){
             console.log(success);
             $rootScope.nineCopons.length = 0;
             Array.prototype.push.apply($rootScope.nineCopons, success.map(function mapFunction(ele, idx, array){
-                return {
-                    /** { title: '地产', desc: '买房立减', price: '￥ 5000' } **/
-                    title: ele.templatename,
-                    desc: ele.shopname,
-                    data: ele.data,
-                    id: ele.id,
-                    origin:ele.origin,
-                    shopid:ele.shopid,
-                    strategyid: ele.strategyid,
-                    price: `${ele.data.offset}`
+                var result = angular.extend({}, ele);
+                result.title = ele.templatename;
+                result.desc = ele.shopname;
+                if(ele.data.offset){//抵用策略
+                    result.price = `${ele.data.offset}`;
                 };
+                return result;
             }));
             $state.go('app.game9box');
         }, function errorFunction(error){
@@ -71,61 +91,87 @@ function($rootScope, $scope, box9GameServices, $state, $stateParams, localStorag
     $rootScope.areaId = areaId;
     console.log($rootScope.areaId);
     if(!areaId){
-        areaId = localStorageService.get('areaId');
+        areaId = NineCouponUtilities.getLocalData('areaId');
     }else{
-        localStorageService.set('areaId', areaId);
+        NineCouponUtilities.saveLocalData('areaId', areaId);
     };
-    if(areaId && !$rootScope.poolTimes){
+    if(areaId && !$rootScope.poolTimes && NineCouponValues.retryTimes.wifi < 4){
         $scope.getUserNineCouponsForAwards(areaId);
     }else{
-
-        // 这里需要提示 
-    }
-    if($rootScope.account){
+        $state.go("app.coupons");
     };
 }])
-.controller('MyCouponController', ['$rootScope', '$scope', '$uibModal', 'localStorageService',
-function($rootScope, $scope, $uibModal, localStorageService){
+.controller('MyCouponController', ['$rootScope', '$scope', '$uibModal', 'NineCouponUtilities',"box9GameServices","NineCouponModal",
+function($rootScope, $scope, $uibModal, NineCouponUtilities,box9GameServices, NineCouponModal){
     $scope.couponListModel = {
         data:{
-            projectList:[]
+            couponList:[]
         }
     };
-    let couponArray = (localStorageService.get('couponArray') || []).filter((ele)=>{
+    var couponArray = (NineCouponUtilities.getLocalData('couponArray'+$rootScope.account.id) || []).filter((ele)=>{
         return !!ele;
     }); 
-    $scope.couponListModel.data.projectList.length = 0;
-    Array.prototype.push.apply($scope.couponListModel.data.projectList, couponArray);
-    $scope.showQrCode = function showQrCode(couponItem){
-        var theConfig = {award:couponItem};
-        var theModal = $uibModal.open({
-            animation: true,
-            size: 'lg',
-            templateUrl : 'views/qrcode.html',
-            controller:"QrCodeController",
-            resolve:{
-                QrCodeModelConfig: function(){
-                    return theConfig;
-                }
-            },
-            windowClass:'ninecoupon-qrcode-background'
+    $scope.displayCouponList = function displayCouponList(){
+        $scope.couponListModel.data.couponList.length = 0;
+        Array.prototype.push.apply($scope.couponListModel.data.couponList, couponArray);
+    }
+    $scope.successMyCoupon = function successMyCoupon(success){
+        var effectiveCouponsList = success.map(function(ele, idx, array){
+            return ele;
         });
+        var effectiveMap = {};
+        effectiveCouponsList.forEach(function(ele){
+            effectiveMap[ele.id] = ele;
+        });
+        var couponMap = {};
+        couponArray.forEach(function(ele, idx, array){
+            couponMap[ele.id] = ele;
+        });
+        couponArray.forEach(function(ele){
+            var effective = effectiveMap[ele.id];
+            if(!effective){
+                ele.status = "useless";
+            };
+        });
+        Array.prototype.push.apply(couponArray, effectiveCouponsList.filter(function(ele, idx, array){
+            var hasTheCoupon = couponMap[ele.id];
+            return !hasTheCoupon;
+        }));
+        NineCouponUtilities.saveLocalData('couponArray'+$rootScope.account.id, couponArray);
+        $scope.displayCouponList();
     };
+    $scope.onRetrySuccess = function onRetrySuccess(scopeInfo, response){
+        $scope.successMyCoupon(response.data);
+    };
+    $rootScope.$on("events:/ninecoupon/coupon/list", $scope.onRetrySuccess);
+    $scope.queryMyCoupons = function queryMyCoupons(){
+        $scope.displayCouponList();
+        box9GameServices.queryMyCoupons().then($scope.successMyCoupon , function errorMyCoupon(error){
+            //todo 提示信息
+        })
+    };
+    $scope.showQrCode = function showQrCode(couponItem){
+        NineCouponModal.showQrcodeModal(couponItem, angular.noop, angular.noop);
+    };
+    $scope.showCouponInfo = function showCouponInfo(couponItem){
+        return couponItem.data.offset + "元"
+    }
+    $scope.queryMyCoupons();
 }])
 .controller('QrCodeController', ['$rootScope', '$scope', '$uibModalInstance','QrCodeModelConfig', 
 function($rootScope, $scope, $uibModalInstance, QrCodeModelConfig){
     console.log(QrCodeModelConfig);
-    var coupon = angular.toJson(QrCodeModelConfig.award);
-    var origin = QrCodeModelConfig.award;
-    $scope.qrcodeModel = {
-        data : coupon,
-        origin: origin,
-        title: `由店家 ${ origin.desc} 提供的 消费满${origin.data.consumption} 抵用 ${origin.data.offset}`
-    };
-
+    var couponInfo = QrCodeModelConfig.award
+    var couponString = angular.toJson({
+        id : couponInfo.id,
+        shopId: couponInfo.shopId,
+        account: couponInfo.account
+    });
+    $scope.qrcodeModel = angular.extend({}, couponInfo);
+    $scope.qrcodeModel.qrcode = couponString;
 }])
-.controller('Game9BoxController', ['$rootScope', '$scope', '$window', 'box9GameServices', '$timeout', '$interval','$state','$uibModal','localStorageService',"EnnUtilities",
-function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $state, $uibModal,localStorageService,EnnUtilities) {
+.controller('Game9BoxController', ['$rootScope', '$scope', '$window', 'box9GameServices', '$timeout', '$interval','$state','$uibModal',"NineCouponUtilities","NineCouponValues","NineCouponModal",
+function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $state, $uibModal,NineCouponUtilities,NineCouponValues,NineCouponModal) {
     (function init() {
         $scope.bkpStyle = $rootScope.bgStyle;
         $rootScope.bgStyle = {
@@ -300,43 +346,25 @@ function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $st
                             }
                             loop();
                             $rootScope.poolTimes = 1;
+                            var takeOffSuccess = function takeOffSuccess(success){
+                                function showCouponModalResult(){
+                                    var couponArray = NineCouponUtilities.getLocalData('couponArray'+$rootScope.account.id) || [];
+                                    couponArray = couponArray.filter(function(ele){
+                                        return !!ele;
+                                    });
+                                    couponArray.push(success);
+                                    NineCouponUtilities.saveLocalData('couponArray'+$rootScope.account.id, couponArray);
+                                };
+                                NineCouponModal.showQrcodeModal(success, showCouponModalResult, showCouponModalResult);
+                            }
                             if($rootScope.account){
-                                box9GameServices.takeOffTheNineCoupon(that.award)
-                                .$promise
-                                .then((success)=>{
-                                    that.award.instanceId = success.id;
-                                    that.award.consumer = success.account;
-                                    var theConfig = {award:that.award};
-                                    var theModal = $uibModal.open({
-                                        animation: true,
-                                        size: 'lg',
-                                        templateUrl : 'views/qrcode.html',
-                                        controller:"QrCodeController",
-                                        resolve:{
-                                            QrCodeModelConfig: function(){
-                                                return theConfig;
-                                            }
-                                        },
-                                        windowClass:'ninecoupon-qrcode-background'
-                                    });
-                                    theModal.result.then(function(){
-                                        let couponArray = localStorageService.get('couponArray') || [];
-                                        couponArray = couponArray.filter(function(ele){
-                                            return !!ele;
-                                        });
-                                        couponArray.push(that.award);
-                                        localStorageService.set('couponArray', couponArray);
-                                    }, function(){
-                                        let couponArray = localStorageService.get('couponArray') || [];
-                                        couponArray = couponArray.filter(function(ele){
-                                            return !!ele;
-                                        });
-                                        couponArray.push(that.award);
-                                        localStorageService.set('couponArray', couponArray);
-                                    });
+                                $rootScope.$on("events:/ninecoupon/coupon", function(scopeInfo, response){
+                                    takeOffSuccess(response.data);
                                 });
+                                box9GameServices.takeOffTheNineCoupon(that.award)
+                                .then(takeOffSuccess);
                             }else{
-                                EnnUtilities.saveLocalData('reward', that.reward, true);
+                                NineCouponUtilities.saveLocalData('reward', that.reward, true);
                                 $rootScope.$broadcast('event:auth-goto-login', "need login");
                             };
                             /**
