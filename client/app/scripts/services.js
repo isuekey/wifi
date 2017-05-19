@@ -62,7 +62,7 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities'
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
-                "Authorization": "Basic Y2xpZW50OnNlY3JldA"
+                "Authorization": "Basic bmluZWNvdXBvbldpZmk6OWEwMTM4MjdiYjY2"
             }
         }).then(function (response) {
             var expiredAt = new Date();
@@ -101,7 +101,7 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities'
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
-                "Authorization": "Basic Y2xpZW50OnNlY3JldA"
+                "Authorization": "Basic bmluZWNvdXBvbldpZmk6OWEwMTM4MjdiYjY2"
             }
         }).then(function (response) {
             var expiredAt = new Date();
