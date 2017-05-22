@@ -37,7 +37,7 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities'
                 self.takeOffTheNineCoupon(reward)
                 .then(function(success){
                     var handleModal = function(){
-                        let couponArray = NineCouponUtilities.getLocalData('couponArray'+$rootScope.account.id) || [];
+                        var couponArray = NineCouponUtilities.getLocalData('couponArray'+$rootScope.account.id) || [];
                         couponArray = couponArray.filter(function(ele){
                             return !!ele;
                         });
@@ -226,7 +226,7 @@ app.factory('wifiHttpInterceptor', function($q, NineCouponUtilities, httpBuffer,
             // do something on error
             //401 而且不是 更新 token
             var token = NineCouponUtilities.getLocalData("token");
-            let retriablle = rejection.status == 401 && rejection.config.url.indexOf('/oauth/token') == -1 && token && token.refresh_token;
+            var retriablle = rejection.status == 401 && rejection.config.url.indexOf('/oauth/token') == -1 && token && token.refresh_token;
             if(retriablle){
                 var deferred = $q.defer();
                 httpBuffer.append(rejection.config, deferred);

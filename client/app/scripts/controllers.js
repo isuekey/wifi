@@ -8,7 +8,7 @@ angular.module("wifi")
 
     $scope.store = {
         name: 'test',
-        storeName: 'xx餐厅',
+        storeName: 'xx餐厅'
     };
 
     $scope.password = '';
@@ -148,20 +148,20 @@ function($rootScope, $scope, $uibModal, NineCouponUtilities,box9GameServices, Ni
         $scope.displayCouponList();
         box9GameServices.queryMyCoupons().then($scope.successMyCoupon , function errorMyCoupon(error){
             //todo 提示信息
-        })
+        });
     };
     $scope.showQrCode = function showQrCode(couponItem){
         NineCouponModal.showQrcodeModal(couponItem, angular.noop, angular.noop);
     };
     $scope.showCouponInfo = function showCouponInfo(couponItem){
-        return couponItem.data.offset + "元"
-    }
+        return couponItem.data.offset + "元";
+    };
     $scope.queryMyCoupons();
 }])
 .controller('QrCodeController', ['$rootScope', '$scope', '$uibModalInstance','QrCodeModelConfig', 
 function($rootScope, $scope, $uibModalInstance, QrCodeModelConfig){
     console.log(QrCodeModelConfig);
-    var couponInfo = QrCodeModelConfig.award
+    var couponInfo = QrCodeModelConfig.award;
     var couponString = angular.toJson({
         id : couponInfo.id,
         shopId: couponInfo.shopId,
@@ -357,7 +357,7 @@ function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $st
                                     NineCouponUtilities.removeLocalData("reward");
                                 };
                                 NineCouponModal.showQrcodeModal(success, showCouponModalResult, showCouponModalResult);
-                            }
+                            };
                             if($rootScope.account){
                                 $rootScope.$on("events:/ninecoupon/coupon", function(scopeInfo, response){
                                     takeOffSuccess(response.data);
