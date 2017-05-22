@@ -367,28 +367,6 @@ function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $st
                                 NineCouponUtilities.saveLocalData('reward', that.reward, true);
                                 $rootScope.$broadcast('event:auth-goto-login', "need login");
                             };
-                            /**
-                            that.award.awardId = fabric.util.getRandomInt(10000, 99999);
-                            box9GameServices.getQrCodeWithAward(that.award)
-                            .$promise
-                            .then(function(res) {
-                                showQrCode(res.path);
-                                realTimeAwardStatusCheck = $interval(function() {
-                                    box9GameServices.getAwardStatus(that.award.awardId)
-                                    .$promise
-                                    .then(function(res) {
-                                        console.log(res);
-                                        if (res.isAwarded) {
-                                            $interval.cancel(realTimeAwardStatusCheck);
-                                            bootbox.alert('兑换' + that.award.title + that.award.desc + that.award.price + '成功');
-                                        }
-                                    });
-                                }, 1000);
-
-                            }, function(res) {
-                                console.log(res);
-                            });
-                            **/
                         }
                     });
                 });
@@ -405,7 +383,7 @@ function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $st
         canvas.add(boxGroup);
         $timeout(function() {
             try{
-                // bounceWav.play();
+                bounceWav.play();
                 canvas.add(results.ticketsFly);
                 results.ticketsFly.play(function() {
                     results.ticketsFly.stop();
@@ -429,116 +407,6 @@ function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $st
             console.log(se);
         }
     });
-
-
-    var showQrCode = function(qrPath) {
-        async.parallel({
-            qrCode: function(cb) {
-                fabric.Image.fromURL(qrPath, function(img) {
-                    cb(null, img);
-                }, { width: 200, height: 200, originY: 'top', originX: 'center', selectable: false });
-            },
-            successBg: function(cb) {
-                fabric.Image.fromURL('assets/images/9gimages/win_bg.png', function(img) {
-                    cb(null, img);
-                }, { width: 326, height: 396, originY: 'top', originX: 'center', selectable: false });
-            },
-            successBtn: function(cb) {
-                fabric.Image.fromURL('assets/images/9gimages/win_btn.png', function(img) {
-                    cb(null, img);
-                }, { width: 156, height: 36, originY: 'center', originX: 'center', lockMovementX: true, lockMovementY: true, hasControls: false, hasBorders: false });
-            }
-        }, function(err, results) {
-            var gW = $window.innerWidth;
-            var gH = 430;
-            var grayBg = new fabric.Rect({
-                left: 0,
-                top: 0,
-                height: bH,
-                width: $window.innerWidth,
-                fill: 'black',
-                opacity: 0,
-                selectable: false
-            });
-
-            var title = new fabric.Text('恭喜您', {
-                top: 25,
-                left: gW / 2,
-                originY: 'center',
-                originX: 'center',
-                fontSize: 25,
-                fill: 'white',
-                selectable: false
-            });
-
-            var subtitle = new fabric.Text('二维码是您唯一的消费凭证', {
-                top: gH - 130,
-                left: gW / 2,
-                originY: 'center',
-                originX: 'center',
-                fill: '#cf9c73',
-                fontSize: 14,
-                selectable: false
-            });
-
-            var subtitle2 = new fabric.Text('请截屏保存，消费时请商家扫描确认。', {
-                top: gH - 110,
-                left: gW / 2,
-                originY: 'center',
-                originX: 'center',
-                fill: '#cf9c73',
-                fontSize: 14,
-                selectable: false
-            });
-
-            results.successBg.left = gW / 2;
-            results.successBg.top = 0;
-            results.qrCode.left = gW / 2;
-            results.qrCode.top = 80;
-            results.successBtn.left = gW / 2;
-            results.successBtn.top = gH - 70;
-
-            var winMsgGroup = new fabric.Group([results.successBg, results.successBtn, results.qrCode, title, subtitle, subtitle2], {
-                top: 60,
-                height: 425,
-                left: $window.innerWidth / 2,
-                width: $window.innerWidth,
-                originX: 'center',
-                originY: 'top',
-                opacity: 0,
-                selectable: false
-            });
-
-            results.successBtn.on('selected', function(e) {
-                grayBg.remove();
-                results.successBg.remove();
-                results.successBtn.remove();
-                results.qrCode.remove();
-                title.remove();
-                subtitle.remove();
-                subtitle2.remove();
-                disableChecker();
-            });
-
-            canvas.add(grayBg);
-            canvas.add(winMsgGroup);
-
-            winMsgGroup.animate('opacity', 1, {
-                duration: 1500,
-                onChange: canvas.renderAll.bind(canvas),
-                onComplete: function() {
-                    ungroup(winMsgGroup, canvas);
-                }
-            });
-
-            grayBg.animate('opacity', 0.7, {
-                duration: 1500,
-                onChange: canvas.renderAll.bind(canvas)
-            });
-
-            canvas.renderAll();
-        });
-    };
 
 
     var ungroup = function(group, canvas) {
