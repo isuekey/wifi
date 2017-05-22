@@ -111,9 +111,17 @@ function($rootScope, $scope, $uibModal, NineCouponUtilities,box9GameServices, Ni
     var couponArray = (NineCouponUtilities.getLocalData('couponArray'+$rootScope.account.id) || []).filter(function(ele){
         return !!ele;
     }); 
+    var couponMap = {};
+
     $scope.displayCouponList = function displayCouponList(){
         $scope.couponListModel.data.couponList.length = 0;
-        Array.prototype.push.apply($scope.couponListModel.data.couponList, couponArray);
+        var tempMap = {};
+        couponArray.forEach(function(ele, idx, array){
+            tempMap[ele.id] = ele;
+        });
+        for(var key in tempMap){
+            $scope.couponListModel.data.couponList.push(tempMap[key]);
+        };
     };
     $scope.successMyCoupon = function successMyCoupon(success){
         var effectiveCouponsList = success.map(function(ele, idx, array){
@@ -123,7 +131,6 @@ function($rootScope, $scope, $uibModal, NineCouponUtilities,box9GameServices, Ni
         effectiveCouponsList.forEach(function(ele){
             effectiveMap[ele.id] = ele;
         });
-        var couponMap = {};
         couponArray.forEach(function(ele, idx, array){
             couponMap[ele.id] = ele;
         });
@@ -352,7 +359,11 @@ function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $st
                                     couponArray = couponArray.filter(function(ele){
                                         return !!ele;
                                     });
-                                    couponArray.push(success);
+                                    if(!couponArray.some(function(ele, idx, array){
+                                        return ele.id == success.id;
+                                    })){
+                                        couponArray.push(success);
+                                    };
                                     NineCouponUtilities.saveLocalData('couponArray'+$rootScope.account.id, couponArray);
                                     NineCouponUtilities.removeLocalData("reward");
                                 };
