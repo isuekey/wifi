@@ -41,7 +41,7 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities'
                         couponArray = couponArray.filter(function(ele){
                             return !!ele;
                         });
-                        couponArray.push(that.award);
+                        couponArray.push(success);
                         NineCouponUtilities.saveLocalData('couponArray'+$rootScope.account.id, couponArray);
                     };
                     NineCouponModal.showQrcodeModal(success, handleModal, handleModal);

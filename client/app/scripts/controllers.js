@@ -21,7 +21,7 @@ angular.module("wifi")
                 bootbox.alert('客户兑换' + res.data.title + res.data.desc + res.data.price + '成功');
             }
         }, function(res) {
-            bootbox.alert('商户账户/密码有误，请确认后重新输入。')
+            bootbox.alert('商户账户/密码有误，请确认后重新输入。');
         });
     };
 
@@ -32,21 +32,21 @@ function($rootScope, $scope, box9GameServices, $state){
     $scope.account = {};
     $rootScope.account = undefined;
     $scope.signup = function(){
-        box9GameServices.signup($scope.account).then((createdAccount)=>{
+        box9GameServices.signup($scope.account).then(function(createdAccount){
             console.log(createdAccount);
             return box9GameServices.login({
                 name: $scope.account.account,
                 password: $scope.account.password
             });
-        }).then((successToken)=>{
+        }).then(function(successToken){
             console.log(successToken);
             return box9GameServices.getAccountInfo();
-        }).then((accountInfo)=>{
+        }).then(function(accountInfo){
             console.log(accountInfo);
             $state.go("app.coupons");
-        }).catch((error)=>{
-            console.log(error)
-        })
+        }).catch(function(error){
+            console.log(error);
+        });
     };
 }])
 .controller('LoginController', ['$rootScope', '$scope', 'box9GameServices','$state', 
@@ -55,12 +55,12 @@ function($rootScope, $scope, box9GameServices, $state){
     $rootScope.account = undefined;
     $scope.login = function(){
         box9GameServices.login($scope.account)
-        .then((success)=>{
-            box9GameServices.getAccountInfo().then((res)=>{
+        .then(function(success){
+            box9GameServices.getAccountInfo().then(function(res){
                 console.log(res);
                 $state.go("app.coupons");
             });
-        }, (error)=>{
+        }, function(error){
             console.log(error);
         });
     };
@@ -84,8 +84,8 @@ function($rootScope, $scope, box9GameServices, $state, $stateParams, NineCouponU
             }));
             $state.go('app.game9box');
         }, function errorFunction(error){
-            console.log(error)
-        })
+            console.log(error);
+        });
     };
     var areaId = $stateParams["areaId"];
     $rootScope.areaId = areaId;
@@ -108,13 +108,13 @@ function($rootScope, $scope, $uibModal, NineCouponUtilities,box9GameServices, Ni
             couponList:[]
         }
     };
-    var couponArray = (NineCouponUtilities.getLocalData('couponArray'+$rootScope.account.id) || []).filter((ele)=>{
+    var couponArray = (NineCouponUtilities.getLocalData('couponArray'+$rootScope.account.id) || []).filter(function(ele){
         return !!ele;
     }); 
     $scope.displayCouponList = function displayCouponList(){
         $scope.couponListModel.data.couponList.length = 0;
         Array.prototype.push.apply($scope.couponListModel.data.couponList, couponArray);
-    }
+    };
     $scope.successMyCoupon = function successMyCoupon(success){
         var effectiveCouponsList = success.map(function(ele, idx, array){
             return ele;
@@ -354,6 +354,7 @@ function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $st
                                     });
                                     couponArray.push(success);
                                     NineCouponUtilities.saveLocalData('couponArray'+$rootScope.account.id, couponArray);
+                                    NineCouponUtilities.removeLocalData("reward");
                                 };
                                 NineCouponModal.showQrcodeModal(success, showCouponModalResult, showCouponModalResult);
                             }
@@ -364,7 +365,7 @@ function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $st
                                 box9GameServices.takeOffTheNineCoupon(that.award)
                                 .then(takeOffSuccess);
                             }else{
-                                NineCouponUtilities.saveLocalData('reward', that.reward, true);
+                                NineCouponUtilities.saveLocalData('reward', that.award, true);
                                 $rootScope.$broadcast('event:auth-goto-login', "need login");
                             };
                         }
