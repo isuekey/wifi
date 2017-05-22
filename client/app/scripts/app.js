@@ -105,7 +105,7 @@ var app = angular.module('wifi', [
     };
     $rootScope.logoutAccount = function logoutAccount(){
         box9GameServices.logoutAccount()
-        .then((success)=>{
+        .then(function(success){
             $state.go("app.login");
         });
     };

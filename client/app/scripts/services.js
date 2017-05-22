@@ -35,7 +35,7 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities'
             var reward = NineCouponUtilities.getLocalData("reward", true);
             if(reward){
                 self.takeOffTheNineCoupon(reward)
-                .then((success)=>{
+                .then(function(success){
                     var handleModal = function(){
                         let couponArray = NineCouponUtilities.getLocalData('couponArray'+$rootScope.account.id) || [];
                         couponArray = couponArray.filter(function(ele){
