@@ -44,6 +44,7 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities'
                         couponArray.push(success);
                         NineCouponUtilities.saveLocalData('couponArray'+$rootScope.account.id, couponArray);
                     };
+                    NineCouponUtilities.removeLocalData("reward");
                     NineCouponModal.showQrcodeModal(success, handleModal, handleModal);
                 });
             };
