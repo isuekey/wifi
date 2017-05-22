@@ -27,7 +27,7 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities'
         return $resource(baseApiUrl + '/games/box9/redeem/:id', {id:'@id'}).save(obj);
     };
     self.getAccountInfo = function(){
-        return $resource(`${baseApiUrl}/ninecoupon/account`).get()
+        return $resource(baseApiUrl+'/ninecoupon/account').get()
         .$promise
         .then(function successFunction(success){
             NineCouponUtilities.saveLocalData("account", success, true);
@@ -51,14 +51,14 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities'
         });
     };
     self.signup = function(account){
-        return $resource(`${baseApiUrl}/ninecoupon/signup`).save({},account).$promise;
+        return $resource(''+baseApiUrl+'/ninecoupon/signup').save({},account).$promise;
     };
 
     self.login = function(account){
         var deferred = $q.defer();
         var promise = deferred.promise;
-        var data = `username=${account.name}&password=${account.password}&grant_type=password`;
-        var post = $http.post(`${baseApiUrl}/oauth/token`, data, {
+        var data = 'username='+account.name+'&password='+account.password+'&grant_type=password';
+        var post = $http.post(''+baseApiUrl+'/oauth/token', data, {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
@@ -86,18 +86,18 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities'
         return defered.promise;
     };
     self.getUserNineCouponsToAwards = function getUserNineCouponsToAwards(areaIndex){
-        return $resource(`${baseApiUrl}/ninecoupon/coupon/wifi/:areaIndex`, {areaIndex:areaIndex}).query().$promise;
+        return $resource(''+baseApiUrl+'/ninecoupon/coupon/wifi/:areaIndex', {areaIndex:areaIndex}).query().$promise;
     };
     self.takeOffTheNineCoupon = function takeOffTheNineCoupon(coupon){
         coupon.randomId = Math.floor(Math.random() * 100000);
-        return $resource(`${baseApiUrl}/ninecoupon/coupon`).save({}, coupon).$promise;
+        return $resource(''+baseApiUrl+'/ninecoupon/coupon').save({}, coupon).$promise;
     };
     self.refreshToken = function refreshToken(){
         var token = NineCouponUtilities.getLocalData("token");
         var deferred = $q.defer();
         var promise = deferred.promise;
         var data = "refresh_token=" +  token.refresh_token + "&grant_type=refresh_token";
-        $http.post(`${baseApiUrl}/oauth/token`, data, {
+        $http.post(''+baseApiUrl+'/oauth/token', data, {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
@@ -117,7 +117,7 @@ app.service("box9GameServices", ['$resource','baseApiUrl', 'NineCouponUtilities'
         return promise;
     };
     self.queryMyCoupons = function queryMyCoupons(){
-        return $resource(`${baseApiUrl}/ninecoupon/coupon/list`).query().$promise;
+        return $resource(''+baseApiUrl+'/ninecoupon/coupon/list').query().$promise;
     }
 }]);
 app.factory("NineCouponModal", function($uibModal){
@@ -195,7 +195,7 @@ app.factory('wifiHttpInterceptor', function($q, NineCouponUtilities, httpBuffer,
                 //使用token
                 var token = NineCouponUtilities.getLocalData('token');
                 if(token){
-                    config.headers.Authorization =  `Bearer ${ token.access_token}`;
+                    config.headers.Authorization =  'Bearer '+ token.access_token+'';
                 }
             }else if(config.url.indexOf('/oauth/token')> -1){
                 //使用密码或者refresh_token
@@ -208,7 +208,7 @@ app.factory('wifiHttpInterceptor', function($q, NineCouponUtilities, httpBuffer,
         'requestError': function(rejection) {
             // do something on error
             if (canRecover(rejection)) {
-                return responseOrNewPromise
+                return responseOrNewPromise;
             }
             return $q.reject(rejection);
         },

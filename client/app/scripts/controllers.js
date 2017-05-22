@@ -78,7 +78,7 @@ function($rootScope, $scope, box9GameServices, $state, $stateParams, NineCouponU
                 result.title = ele.templatename;
                 result.desc = ele.shopname;
                 if(ele.data.offset){//抵用策略
-                    result.price = `${ele.data.offset}`;
+                    result.price = ""+ele.data.offset;
                 };
                 return result;
             }));
