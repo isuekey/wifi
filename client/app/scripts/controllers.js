@@ -404,7 +404,7 @@ function($rootScope, $scope, $window, box9GameServices, $timeout, $interval, $st
         });
         canvas.add(boxGroup);
         $timeout(function() {
-            bounceWav.play();
+            // bounceWav.play();
             canvas.add(results.ticketsFly);
             results.ticketsFly.play(function() {
                 results.ticketsFly.stop();
